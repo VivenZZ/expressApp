@@ -1,28 +1,19 @@
-var express = require('express');
-var http = require('http');
-var app = express();
+// 加载express模块
+const express = require("express");
+// 生成express实例
+const app = express();
+const path = require('path');
+// 设定express实例参数
 
-// 重定向的请求要在发送headers之前，不然会报错。
-app.get("/about", (req, res) => {
-    // 重定向
-    res.redirect("/hello/admin");
-});
-// 所有的请求都通过这里
-app.all('*', (req, res, next) => {
-    res.writeHead(200, {"Content-Type": "text/plain"});
-    next();
-});
-app.get("/", (req, res) => res.end("home page!"));
-// 带参数的请求
-// app.get("/hello/:who", (req, res) => res.end(req.params.who));
-// 带参数的请求可选
-app.get("/hello/:who?", (req, res) => {
-    if (req.params.who) {
-        res.end(req.params.who);
-    } else {
-        res.end('hello!');
-    }
-});
-app.get("*", (req, res) => res.end("404!"));
+// 设置port变量，访问端口
+app.set('port', process.env.PORT || 3000);
+// 设定views变量，视图存放的目录
+app.set('views', path.join(__dirname, 'views'));
+// 设定view engine变量，网页模板引擎
+app.set('view engine', 'jade');
 
-http.createServer(app).listen(1337);
+// 设定静态文件目录，比如本地文件
+// 目录为demo/public/images，访问
+// 网址则显示为http://localhost:3000/images
+app.use(express.static(path.join(__dirname, 'public')));
+app.listen(app.get('port'));
