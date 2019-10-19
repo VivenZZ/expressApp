@@ -1,26 +1,24 @@
 var express = require('express');
+var http = require('http');
 var app = express();
-var routers = require('./routers');
-app.use(express.static(__dirname + '/public'));
-app.use((req, res, next) => {
-    if (req.url == "/") {
-        res.writeHead(200, {"Content-Type": "text/plain"});
-        res.end("Welcome to the homepage!\n");
+
+// 所有的请求都通过这里
+app.all('*', (req, res, next) => {
+    res.writeHead(200, {"Content-Type": "text/plain"});
+    next();
+});
+app.get("/", (req, res) => res.end("home page!"));
+app.get("/about", (req, res) => res.end("about page!"));
+// 带参数的请求
+// app.get("/hello/:who", (req, res) => res.end(req.params.who));
+// 带参数的请求可选
+app.get("/hello/:who?", (req, res) => {
+    if (req.params.who) {
+        res.end(req.params.who);
     } else {
-        next();
+        res.end('hello!');
     }
 });
-app.use((req, res, next) => {
-    if (req.url == "/about") {
-        res.writeHead(200, {"Content-Type": "text/plain"});
-        res.end("Welcome to the aboutpage!\n");
-    } else {
-        next();
-    }
-});
-routers(app);
-app.use((req, res) => {
-    res.writeHead(404, {"Content-Type": "text/plain"});
-    res.end("404 error!\n");
-});
-app.listen(1337);
+app.get("*", (req, res) => res.end("404!"));
+
+http.createServer(app).listen(1337);
